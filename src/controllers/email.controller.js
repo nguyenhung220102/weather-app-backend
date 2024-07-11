@@ -33,7 +33,7 @@ exports.subscribeEmail = async (req, res) => {
     try {
         let existingEmail = await Email.findOne({ email: email });
         if (existingEmail) {
-            return res.status(400).send("Email already exists");
+            return res.status(200).send("Email already exists");
         }
 
         const confirmationCode = crypto.randomBytes(16).toString("hex");
