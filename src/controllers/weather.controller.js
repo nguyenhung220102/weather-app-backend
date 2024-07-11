@@ -1,7 +1,7 @@
 let axios = require('axios')
 
 exports.getWeatherData = async (req, res) => {
-    const { city, range, geo_coordinate } = req.query;
+    const { city, range } = req.query;
 
     if (!city) {
       return res.status(400).send('City is required');
