@@ -3,16 +3,19 @@ var nodecron = require("node-cron");
 const axios = require("axios");
 const Email = require("../models/email.model");
 
-let transporter = nodemailer.createTransport({
-    service: "gmail",
-    port: 456,
-    host: "smtp.gmail.com",
-    secure: true,
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
-    },
-});
+const generateMailTransporter = async () => {
+    let transport = await nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    return transport;
+};
 
 const sendDailyEmails = async () => {
     try {
@@ -29,14 +32,18 @@ const sendDailyEmails = async () => {
     }
 };
 
-nodecron.schedule("0 9 * * *", async () => {
-    console.log("Sending daily emails...");
-    await sendDailyEmails();
-});
+// Daily sending email to customers at 9AM (Vietnamese Timezone)
+nodecron.schedule(
+    "0 9 * * *",
+    async () => {
+        console.log("Sending daily emails...");
+        await sendDailyEmails();
+    },
+    { timezone: "Asia/Ho_Chi_Minh" }
+);
 
 const sendConfirmationEmail = async (recipient, code) => {
     try {
-        console.log(process.env.EMAIL,  process.env.PASSWORD)
         let mailOptions = {
             from: process.env.EMAIL,
             to: recipient,
@@ -58,7 +65,7 @@ const sendConfirmationEmail = async (recipient, code) => {
                         <tbody>
                           <tr>
                             <td align="center" bgcolor="#4361E5" role="presentation" style="border:0px #000000 solid;border-radius:8px;cursor:auto;font-style:normal;mso-padding-alt:9px 20px 10px 20px;background:#4361E5;" valign="middle">
-                              <a href="${process.env.BACKEND_URL}${code}" style="display:inline-block;background:#4361E5;color:#ffffff;font-size:13px;font-style:normal;font-weight:normal;line-height:100%;margin:0;text-decoration:none;text-transform:none;padding:9px 20px 10px 20px;mso-padding-alt:0px;border-radius:8px;" target="_blank">
+                              <a href="${process.env.BACKEND_URL}emails/${code}" style="display:inline-block;background:#4361E5;color:#ffffff;font-size:13px;font-style:normal;font-weight:normal;line-height:100%;margin:0;text-decoration:none;text-transform:none;padding:9px 20px 10px 20px;mso-padding-alt:0px;border-radius:8px;" target="_blank">
                                 <strong>SUBSCRIBE</strong>
                               </a>
                             </td>
@@ -81,6 +88,7 @@ const sendConfirmationEmail = async (recipient, code) => {
               </table>
               `,
         };
+        let transporter = await generateMailTransporter();
         let info = await transporter.sendMail(mailOptions);
     } catch (error) {
         console.error("Error sending email:", error);
@@ -103,7 +111,7 @@ const sendDailyWeather = async (recipient, city) => {
         let mailOptions = {
             from: process.env.GMAIL_USERNAME,
             to: recipient,
-            subject: `Daily Weather Update for ${name}`,
+            subject: `DAILY WEATHER UPDATE FOR ${name}`,
             html: `
               <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                 <tbody>
@@ -135,6 +143,7 @@ const sendDailyWeather = async (recipient, city) => {
               </table>
             `,
         };
+        let transporter = await generateMailTransporter();
         let info = await transporter.sendMail(mailOptions);
     } catch (error) {
         console.error("Error sending email:", error);
