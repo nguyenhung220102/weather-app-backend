@@ -13,11 +13,6 @@ Cities list from: [https://openweathermap.org/storage/app/media/cities_list.xlsx
 
 ## API Reference
 
-#### Get all ctities
-
-```http
-  GET /cities
-```
 #### Get specific location data
 
 ```http
