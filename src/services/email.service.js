@@ -22,7 +22,7 @@ const sendDailyEmails = async () => {
         const customers = await Email.find({ isRegistered: true });
         customers.forEach(async (customer) => {
             const recipient = customer.email;
-            await sendDailyWeather(recipient, customer.city);
+            await sendDailyWeather(recipient, customer.city, customer.confirmationCode);
         });
         console.log(
             `Daily emails sent successfully to ${customers.length} customers.`
@@ -51,7 +51,7 @@ const sendConfirmationEmail = async (recipient, code) => {
             html: `<table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                 <tbody>
                   <tr>
-                    <td align="left" style="font-size:0px;padding:15px 15px 15px 15px;word-break:break-word;">
+                    <td align="left" style="font-size:0px;padding:15px;word-break:break-word;">
                       <div style="font-size:13px;line-height:1.5;text-align:left;color:#000000;">
                         <p>Dear ${recipient},</p>
                         <p>&nbsp;</p>
@@ -75,7 +75,7 @@ const sendConfirmationEmail = async (recipient, code) => {
                     </td>
                   </tr>
                   <tr>
-                    <td align="left" style="font-size:0px;padding:15px 15px 15px 15px;word-break:break-word;">
+                    <td align="left" style="font-size:0px;padding:15px;word-break:break-word;">
                       <div style="font-size:13px;line-height:1.5;text-align:left;color:#000000;">
                         <p>We appreciate your trust in our service and look forward to keeping you informed about the latest weather conditions.</p>
                         <p>&nbsp;</p>
@@ -95,7 +95,7 @@ const sendConfirmationEmail = async (recipient, code) => {
     }
 };
 
-const sendDailyWeather = async (recipient, city) => {
+const sendDailyWeather = async (recipient, city, code) => {
     try {
         const response = await axios.get(process.env.WEATHER_DAILY_API_URL, {
             params: {
@@ -116,7 +116,7 @@ const sendDailyWeather = async (recipient, city) => {
               <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                 <tbody>
                   <tr>
-                    <td align="left" style="font-size:0px;padding:15px 15px 15px 15px;word-break:break-word;">
+                    <td align="left" style="font-size:0px;padding:15px;word-break:break-word;">
                       <div style="font-size:13px;line-height:1.5;text-align:left;color:#000000;">
                         <p>Dear ${recipient},</p>
                         <p>&nbsp;</p>
@@ -130,7 +130,30 @@ const sendDailyWeather = async (recipient, city) => {
                     </td>
                   </tr>
                   <tr>
-                    <td align="left" style="font-size:0px;padding:15px 15px 15px 15px;word-break:break-word;">
+                    <td align="left" style="font-size:0px;word-break:break-word;">
+                      <div style="font-size:13px;line-height:1.5;text-align:left;color:#000000;">
+                        <p>To unsubscribe from this service, you can click the button below.</p>
+                        <p>&nbsp;</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" vertical-align="middle" style="font-size:0px;word-break:break-word;">
+                      <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;width:auto;line-height:100%;">
+                        <tbody>
+                          <tr>
+                            <td align="center" bgcolor="#FF5733" role="presentation" style="border:0px #000000 solid;border-radius:8px;cursor:auto;font-style:normal;mso-padding-alt:9px 20px 10px 20px;background:#FF5733;" valign="middle">
+                              <a href="${process.env.BACKEND_URL}emails/unsubscribe/${code}" style="display:inline-block;background:#FF5733;color:#ffffff;font-size:13px;font-style:normal;font-weight:normal;line-height:100%;margin:0;text-decoration:none;padding:10px 20px 10px 20px;border-radius:8px;" target="_blank">
+                                <strong>UNSUBSCRIBE</strong>
+                              </a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="left" style="font-size:0px;padding:10px;word-break:break-word;">
                       <div style="font-size:13px;line-height:1.5;text-align:left;color:#000000;">
                         <p>We appreciate your trust in our service and hope this information helps you plan your day accordingly.</p>
                         <p>&nbsp;</p>

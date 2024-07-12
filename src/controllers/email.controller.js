@@ -51,3 +51,21 @@ exports.subscribeEmail = async (req, res) => {
         res.status(500).send("Error subscribing email");
     }
 };
+
+exports.unsubscribeEmail = async (req, res) => {
+    const { code } = req.params;
+    try {
+        let existingEmail = await Email.findOne({ confirmationCode: code });
+        if (!existingEmail) {
+            return res.status(400).send("Email confirmation code is not valid");
+        }
+        if (!existingEmail.isRegistered) {
+            return res.status(400).send("Email is not registered");
+        }
+        await Email.deleteOne({ confirmationCode: code });
+        res.status(200).send("Email subscription cancelled successfully");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error cancelling email subscription");
+    }
+};
