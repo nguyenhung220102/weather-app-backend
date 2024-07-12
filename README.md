@@ -5,7 +5,7 @@ This is a backend for a Weather App provides real-time weather information inclu
 
 Weather API service from: [https://www.weatherapi.com](https://www.weatherapi.com) (free version)
 
-
+Cities list from: [https://openweathermap.org/storage/app/media/cities_list.xlsx](https://openweathermap.org/storage/app/media/cities_list.xlsx).
 
 ## URL API DEMO
 
